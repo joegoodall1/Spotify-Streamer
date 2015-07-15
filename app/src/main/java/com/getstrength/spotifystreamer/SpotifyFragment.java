@@ -17,9 +17,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -30,8 +34,11 @@ import retrofit.client.Response;
  */
 public class SpotifyFragment extends Fragment {
 
-    private SpotifyAdapter mSpotifyAdapter;
+    private static final String SAVE_QUERY_KEY = "query";
 
+    private String mSearchQuery;
+    private ArtistsAdapter mArtistsAdapter;
+    private SpotifyService mSpotifyService;
 
     public SpotifyFragment() {
     }
@@ -41,8 +48,10 @@ public class SpotifyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
-    }
 
+        SpotifyApi api = new SpotifyApi();
+        mSpotifyService = api.getService();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -68,11 +77,10 @@ public class SpotifyFragment extends Fragment {
 
 
     private boolean performQuery(String searchQuery) {
-        SpotifyApi api = new SpotifyApi();
 
-        SpotifyService spotify = api.getService();
+        mSearchQuery = searchQuery;
 
-        spotify.searchArtists(searchQuery, new Callback<ArtistsPager>() {
+        mSpotifyService.searchArtists(searchQuery, new Callback<ArtistsPager>() {
 
             @Override
             public void success(ArtistsPager artistsPager, Response response) {
@@ -82,9 +90,9 @@ public class SpotifyFragment extends Fragment {
             @Override
             public void failure(RetrofitError error) {
                 Log.d("fail", error.toString());
-
             }
         });
+
         return true;
     }
 
@@ -93,21 +101,43 @@ public class SpotifyFragment extends Fragment {
                              Bundle savedInstanceState) {
 
 
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        return inflater.inflate(R.layout.fragment_main, container, false);
+    }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        return rootView;
+        if (savedInstanceState != null) {
+            String query = savedInstanceState.getString(SpotifyFragment.SAVE_QUERY_KEY);
+            if (query != null) {
+                performQuery(query);
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SpotifyFragment.SAVE_QUERY_KEY, mSearchQuery);
     }
 
     private void onSpotifyResults(ArtistsPager artistsPager, Response response) {
 
-      
+        final Activity activity = super.getActivity();
 
+        List<Artist> artists = artistsPager.artists.items;
+        if (artists.size() == 0) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, "No artist found. Please refine search.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            return;
+        }
 
-        Activity activity = super.getActivity();
-
-        mSpotifyAdapter = new SpotifyAdapter(activity, artistsPager.artists.items);
-
+        mArtistsAdapter = new ArtistsAdapter(activity, artists);
 
         // Get a reference to the ListView, and attach this adapter to it.
         final ListView listView = (ListView) getView().findViewById(R.id.listView);
@@ -115,7 +145,7 @@ public class SpotifyFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                listView.setAdapter(mSpotifyAdapter);
+                listView.setAdapter(mArtistsAdapter);
             }
         });
     }
