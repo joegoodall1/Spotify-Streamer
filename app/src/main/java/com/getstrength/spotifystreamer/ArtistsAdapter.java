@@ -14,26 +14,23 @@ import com.squareup.picasso.RequestCreator;
 
 import java.util.List;
 
-import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.Image;
-
 /**
  * Created by Joe on 09/07/15.
  */
-public class ArtistsAdapter extends ArrayAdapter<Artist> {
+public class ArtistsAdapter extends ArrayAdapter<ParcelableArtist> {
 
     private static final String ARTIST_NAME_KEY = "artist_name";
     private static final String ARTIST_ID_KEY = "artist_id";
 
-    public ArtistsAdapter(Context context, List<Artist> artists) {
-        super(context, 0, artists);
+    public ArtistsAdapter(Context context, List<ParcelableArtist> parcelableArtists) {
+        super(context, 0, parcelableArtists);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         // Get the data item for this position
-        final Artist artist = super.getItem(position);
+        final ParcelableArtist parcelableArtist = super.getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -43,8 +40,8 @@ public class ArtistsAdapter extends ArrayAdapter<Artist> {
                 public void onClick(View view) {
                     Context context = ArtistsAdapter.this.getContext();
                     Intent intent = new Intent(context, TopTracksActivity.class);
-                    intent.putExtra(ArtistsAdapter.ARTIST_NAME_KEY, artist.name);
-                    intent.putExtra(ArtistsAdapter.ARTIST_ID_KEY, artist.id);
+                    intent.putExtra(ArtistsAdapter.ARTIST_NAME_KEY, parcelableArtist.name);
+                    intent.putExtra(ArtistsAdapter.ARTIST_ID_KEY, parcelableArtist.id);
                     context.startActivity(intent);
                 }
             });
@@ -55,15 +52,14 @@ public class ArtistsAdapter extends ArrayAdapter<Artist> {
         ImageView mImageView = (ImageView) convertView.findViewById(R.id.artistView);
 
         // Populate the data into the template view using the data object
-        mTextView.setText(artist.name);
+        mTextView.setText(parcelableArtist.name);
 
-        List<Image> images = artist.images;
 
-        if (images.size() == 0) {
+        if (parcelableArtist.imageURL == null) {
             mImageView.setImageResource(R.mipmap.spotify1);
         } else {
             Picasso picasso = Picasso.with(super.getContext());
-            RequestCreator requestCreator = picasso.load(images.get(0).url);
+            RequestCreator requestCreator = picasso.load(parcelableArtist.imageURL);
             requestCreator.into(mImageView);
         }
 

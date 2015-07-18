@@ -38,10 +38,13 @@ public class TopTracksAdapter extends ArrayAdapter<Track> {
 
         // Lookup view for data population
         TextView mTextView = (TextView) convertView.findViewById(R.id.list_artists);
+        TextView mTextView2 = (TextView) convertView.findViewById(R.id.album_name);
         ImageView mImageView = (ImageView) convertView.findViewById(R.id.artistView);
+
 
         // Populate the data into the template view using the data object
         mTextView.setText(track.name);
+        mTextView2.setText(track.album.name);
 
         List<Image> images = track.album.images;
 

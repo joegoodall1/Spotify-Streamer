@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -34,14 +35,27 @@ import retrofit.client.Response;
  */
 public class SpotifyFragment extends Fragment {
 
-    private static final String SAVE_QUERY_KEY = "query";
+    //private static final String SAVE_QUERY_KEY = "query";
 
-    private String mSearchQuery;
     private ArtistsAdapter mArtistsAdapter;
     private SpotifyService mSpotifyService;
 
     public SpotifyFragment() {
     }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ArrayList<ParcelableArtist> list = new ArrayList<>();
+        for (int i = 0; i < mArtistsAdapter.getCount(); i++) {
+            list.add(mArtistsAdapter.getItem(i));
+        }
+
+
+        outState.putParcelableArrayList("artists", list);
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +66,7 @@ public class SpotifyFragment extends Fragment {
         SpotifyApi api = new SpotifyApi();
         mSpotifyService = api.getService();
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -78,13 +93,11 @@ public class SpotifyFragment extends Fragment {
 
     private boolean performQuery(String searchQuery) {
 
-        mSearchQuery = searchQuery;
-
         mSpotifyService.searchArtists(searchQuery, new Callback<ArtistsPager>() {
 
             @Override
             public void success(ArtistsPager artistsPager, Response response) {
-                SpotifyFragment.this.onSpotifyResults(artistsPager, response);
+                SpotifyFragment.this.onSpotifyResults(artistsPager);
             }
 
             @Override
@@ -97,6 +110,19 @@ public class SpotifyFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mArtistsAdapter = new ArtistsAdapter(getActivity(), new ArrayList<ParcelableArtist>());
+        if (savedInstanceState != null) {
+            ArrayList<ParcelableArtist> artists = savedInstanceState.getParcelableArrayList("artists");
+            if (artists != null)
+                mArtistsAdapter.addAll(artists);
+        }
+        final ListView listView = (ListView) getView().findViewById(R.id.listView);
+        listView.setAdapter(mArtistsAdapter);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -104,7 +130,8 @@ public class SpotifyFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
-    @Override
+    
+    /*@Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -120,9 +147,9 @@ public class SpotifyFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(SpotifyFragment.SAVE_QUERY_KEY, mSearchQuery);
-    }
+    }*/
 
-    private void onSpotifyResults(ArtistsPager artistsPager, Response response) {
+    private void onSpotifyResults(ArtistsPager artistsPager) {
 
         final Activity activity = super.getActivity();
 
@@ -136,16 +163,26 @@ public class SpotifyFragment extends Fragment {
             });
             return;
         }
+        final List<ParcelableArtist> list = new ArrayList<>();
 
-        mArtistsAdapter = new ArtistsAdapter(activity, artists);
+        for (Artist artist : artists) {
+            String url;
+            if (artist.images.size() == 0) {
+                url = null;
+            } else {
+                url = artist.images.get(0).url;
+            }
+            list.add(new ParcelableArtist(artist.name, url, artist.id));
+        }
+
 
         // Get a reference to the ListView, and attach this adapter to it.
-        final ListView listView = (ListView) getView().findViewById(R.id.listView);
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                listView.setAdapter(mArtistsAdapter);
+                mArtistsAdapter.clear();
+                mArtistsAdapter.addAll(list);
             }
         });
     }

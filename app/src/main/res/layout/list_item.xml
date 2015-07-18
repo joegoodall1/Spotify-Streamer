@@ -1,26 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+              android:layout_height="?android:attr/listPreferredItemHeight"
+              android:padding="6dp">
+
     <ImageView
         android:id="@+id/artistView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        android:src="@drawable/abc_ab_share_pack_mtrl_alpha"/>
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_marginRight="6dp"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/list_artists"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/album_name"
+            android:singleLine="true"
+            android:ellipsize="marquee"/>
+        </LinearLayout>
+
+    </LinearLayout>-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="?android:attr/listPreferredItemHeight"
+                android:padding="2dp">
+
+    <ImageView
+        android:id="@+id/artistView"
+        android:layout_gravity="left"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="2dp"/>
 
     <TextView
           android:layout_width="match_parent"
-          android:layout_weight="0.5"
-          android:layout_height="wrap_content"
-          android:minHeight="?android:attr/listPreferredItemHeight"
+          android:layout_height="26dip"
           android:layout_toRightOf="@id/artistView"
-          android:gravity="center_vertical"
-          android:id="@+id/list_artists"
-            android:text="vjsdvjsd"/>
+          android:layout_alignParentBottom="true"
+          android:layout_alignParentRight="true"
+          android:singleLine="true"
+          android:ellipsize="marquee"
+          android:id="@+id/album_name"/>
 
-</LinearLayout>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/artistView"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/album_name"
+        android:layout_alignWithParentIfMissing="true"
+        android:gravity="clip_vertical"
+        android:id="@+id/list_artists"/>
+
+</RelativeLayout>
+
 
