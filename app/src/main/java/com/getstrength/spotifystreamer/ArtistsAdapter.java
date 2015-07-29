@@ -35,16 +35,6 @@ public class ArtistsAdapter extends ArrayAdapter<ParcelableArtist> {
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
-            convertView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Context context = ArtistsAdapter.this.getContext();
-                    Intent intent = new Intent(context, TopTracksActivity.class);
-                    intent.putExtra(ArtistsAdapter.ARTIST_NAME_KEY, parcelableArtist.name);
-                    intent.putExtra(ArtistsAdapter.ARTIST_ID_KEY, parcelableArtist.id);
-                    context.startActivity(intent);
-                }
-            });
         }
 
         // Lookup view for data population
@@ -62,6 +52,17 @@ public class ArtistsAdapter extends ArrayAdapter<ParcelableArtist> {
             RequestCreator requestCreator = picasso.load(parcelableArtist.imageURL);
             requestCreator.into(mImageView);
         }
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context context = ArtistsAdapter.this.getContext();
+                Intent intent = new Intent(context, TopTracksActivity.class);
+                intent.putExtra(ArtistsAdapter.ARTIST_NAME_KEY, parcelableArtist.name);
+                intent.putExtra(ArtistsAdapter.ARTIST_ID_KEY, parcelableArtist.id);
+                context.startActivity(intent);
+            }
+        });
 
         // Return the completed view to render on screen
         return convertView;

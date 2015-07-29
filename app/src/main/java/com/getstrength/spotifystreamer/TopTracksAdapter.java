@@ -13,23 +13,21 @@ import com.squareup.picasso.RequestCreator;
 
 import java.util.List;
 
-import kaaes.spotify.webapi.android.models.Image;
-import kaaes.spotify.webapi.android.models.Track;
-
 /**
  * Created by Joe on 09/07/15.
  */
-public class TopTracksAdapter extends ArrayAdapter<Track> {
+public class TopTracksAdapter extends ArrayAdapter<ParcelableTopTracks> {
 
-    public TopTracksAdapter(Context context, List<Track> artists) {
-        super(context, 0, artists);
+    public TopTracksAdapter(Context context, List<ParcelableTopTracks> parcelableTopTracks) {
+        super(context, 0, parcelableTopTracks);
     }
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         // Get the data item for this position
-        final Track track = super.getItem(position);
+        final ParcelableTopTracks parcelableTopTracks = super.getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -43,16 +41,15 @@ public class TopTracksAdapter extends ArrayAdapter<Track> {
 
 
         // Populate the data into the template view using the data object
-        mTextView.setText(track.name);
-        mTextView2.setText(track.album.name);
+        mTextView.setText(parcelableTopTracks.trackName);
+        mTextView2.setText(parcelableTopTracks.albumName);
 
-        List<Image> images = track.album.images;
 
-        if (images.size() == 0) {
+        if (parcelableTopTracks.albumImage == null) {
             mImageView.setImageResource(R.mipmap.spotify1);
         } else {
             Picasso picasso = Picasso.with(super.getContext());
-            RequestCreator requestCreator = picasso.load(images.get(0).url);
+            RequestCreator requestCreator = picasso.load(parcelableTopTracks.albumImage);
             requestCreator.into(mImageView);
         }
 

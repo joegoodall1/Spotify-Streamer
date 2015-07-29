@@ -9,6 +9,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +28,9 @@ import retrofit.client.Response;
  */
 public class TopTracksActivity extends ActionBarActivity {
 
+    private ListView mListView;
+    private TopTracksAdapter mTracksAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -43,7 +47,30 @@ public class TopTracksActivity extends ActionBarActivity {
         TextView artistNameView = (TextView) actionBar.getCustomView().findViewById(R.id.action_bar_artist);
         artistNameView.setText(artistName);
 
-        initializeAdapter();
+        mListView = (ListView) super.findViewById(R.id.listView);
+
+        if (savedInstanceState != null) {
+            ArrayList<ParcelableTopTracks> tracks = savedInstanceState.getParcelableArrayList("tracks");
+            if (tracks != null) {
+                mTracksAdapter = new TopTracksAdapter(this, tracks);
+                mTracksAdapter.addAll(tracks);
+                mListView.setAdapter(mTracksAdapter);
+            }
+        } else {
+            initializeAdapter();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        ArrayList<ParcelableTopTracks> list = new ArrayList<>();
+        for (int i = 0; i < mTracksAdapter.getCount(); i++) {
+            list.add(mTracksAdapter.getItem(i));
+        }
+
+        outState.putParcelableArrayList("tracks", list);
     }
 
     @Override
@@ -99,15 +126,24 @@ public class TopTracksActivity extends ActionBarActivity {
             return;
         }
 
-        final TopTracksAdapter tracksAdapter = new TopTracksAdapter(this, trackItems);
+        final List<ParcelableTopTracks> list = new ArrayList<>();
 
-        // Get a reference to the ListView, and attach this adapter to it.
-        final ListView listView = (ListView) super.findViewById(R.id.listView);
+        for (Track track : tracks.tracks) {
+            String url;
+            if (track.album.images.size() == 0) {
+                url = null;
+            } else {
+                url = track.album.images.get(0).url;
+            }
+            list.add(new ParcelableTopTracks(track.name, track.album.name, url));
+        }
+
+        mTracksAdapter = new TopTracksAdapter(this, list);
 
         super.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                listView.setAdapter(tracksAdapter);
+                mListView.setAdapter(mTracksAdapter);
             }
         });
     }
