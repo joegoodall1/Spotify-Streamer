@@ -1,6 +1,7 @@
 package com.getstrength.spotifystreamer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,9 @@ import java.util.List;
  * Created by Joe on 09/07/15.
  */
 public class TopTracksAdapter extends ArrayAdapter<ParcelableTopTracks> {
+
+    private static final String TRACK_NAME = "track_name";
+    private static final String ALBUM_NAME = "album_name";
 
     public TopTracksAdapter(Context context, List<ParcelableTopTracks> parcelableTopTracks) {
         super(context, 0, parcelableTopTracks);
@@ -52,6 +56,17 @@ public class TopTracksAdapter extends ArrayAdapter<ParcelableTopTracks> {
             RequestCreator requestCreator = picasso.load(parcelableTopTracks.albumImage);
             requestCreator.into(mImageView);
         }
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context context = TopTracksAdapter.this.getContext();
+                Intent intent = new Intent(context, SpotifyPlayer.class);
+                intent.putExtra(TopTracksAdapter.TRACK_NAME, parcelableTopTracks.trackName);
+                intent.putExtra(TopTracksAdapter.ALBUM_NAME, parcelableTopTracks.albumName);
+                context.startActivity(intent);
+            }
+        });
 
         // Return the completed view to render on screen
         return convertView;
