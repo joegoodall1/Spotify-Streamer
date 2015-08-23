@@ -32,7 +32,7 @@ public class ParcelableTopTracks implements Parcelable {
     }
 
 
-    protected ParcelableTopTracks(Parcel in) {
+    protected ParcelableTopTracks(ParcelableTopTracks in) {
         this.trackName = in.readString();
         this.albumName = in.readString();
         this.albumImage = in.readString();

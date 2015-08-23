@@ -62,8 +62,8 @@ public class TopTracksAdapter extends ArrayAdapter<ParcelableTopTracks> {
             public void onClick(View view) {
                 Context context = TopTracksAdapter.this.getContext();
                 Intent intent = new Intent(context, SpotifyPlayer.class);
-                intent.putExtra(TopTracksAdapter.TRACK_NAME, parcelableTopTracks.trackName);
-                intent.putExtra(TopTracksAdapter.ALBUM_NAME, parcelableTopTracks.albumName);
+                ParcelableTopTracks parcelableTopTracks = new ParcelableTopTracks(context, parcelableTopTracks);
+                intent.putExtra("TopTracks", parcelableTopTracks);
                 context.startActivity(intent);
             }
         });
