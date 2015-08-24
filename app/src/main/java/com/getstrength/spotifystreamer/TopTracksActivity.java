@@ -50,7 +50,7 @@ public class TopTracksActivity extends AppCompatActivity {
         mListView = (ListView) super.findViewById(R.id.listView);
 
         if (savedInstanceState != null) {
-            ArrayList<ParcelableTopTracks> tracks = savedInstanceState.getParcelableArrayList("tracks");
+            ArrayList<ParcelableTopTrack> tracks = savedInstanceState.getParcelableArrayList("tracks");
             if (tracks != null) {
                 mTracksAdapter = new TopTracksAdapter(this, tracks);
                 mTracksAdapter.addAll(tracks);
@@ -65,7 +65,7 @@ public class TopTracksActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        ArrayList<ParcelableTopTracks> list = new ArrayList<>();
+        ArrayList<ParcelableTopTrack> list = new ArrayList<>();
         for (int i = 0; i < mTracksAdapter.getCount(); i++) {
             list.add(mTracksAdapter.getItem(i));
         }
@@ -126,7 +126,7 @@ public class TopTracksActivity extends AppCompatActivity {
             return;
         }
 
-        final List<ParcelableTopTracks> list = new ArrayList<>();
+        final ArrayList<ParcelableTopTrack> list = new ArrayList<>();
 
         for (Track track : tracks.tracks) {
             String url;
@@ -135,7 +135,13 @@ public class TopTracksActivity extends AppCompatActivity {
             } else {
                 url = track.album.images.get(0).url;
             }
-            list.add(new ParcelableTopTracks(track.name, track.album.name, url));
+
+            String artistName = "Unknown";
+            if (track.artists.size() > 0) {
+                artistName = track.artists.get(0).name;
+            }
+
+            list.add(new ParcelableTopTrack(track.name, track.album.name, url, track.preview_url, artistName));
         }
 
         mTracksAdapter = new TopTracksAdapter(this, list);

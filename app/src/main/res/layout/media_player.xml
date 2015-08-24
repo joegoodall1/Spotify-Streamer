@@ -97,7 +97,6 @@
             android:layout_weight="1"
             android:textOn=""
             android:textOff=""
-            android:background="@drawable/button_custom"
             android:id="@+id/imageButtonPlayPause"
             tools:ignore="ContentDescription"
             android:layout_alignParentBottom="true"/>

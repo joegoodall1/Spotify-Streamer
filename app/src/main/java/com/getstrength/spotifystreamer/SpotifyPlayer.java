@@ -8,13 +8,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class SpotifyPlayer extends Activity implements OnCompletionListener, SeekBar.OnSeekBarChangeListener {
@@ -23,6 +26,10 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
     private ImageButton btnNext;
     private ImageButton btnPrevious;
     private SeekBar songProgressBar;
+
+    private TextView artistName;
+    private TextView albumName;
+    private ImageView albumArtwork;
     private TextView songTitleLabel;
     private TextView songCurrentDurationLabel;
     private TextView songTotalDurationLabel;
@@ -33,8 +40,13 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
     private int seekForwardTime = 5000; // 5000 milliseconds
     private int seekBackwardTime = 5000; // 5000 milliseconds
     private int currentSongIndex = 0;
-    private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+    private ArrayList<ParcelableTopTrack> mParcelableTopTracks;
+    private int mIndex;
+    private TopTracksAdapter topTracksAdapter;
     private Utilities utils;
+
+    private boolean paused = false;
+    private int trackProgress = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,51 +62,33 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
         songCurrentDurationLabel = (TextView) findViewById(R.id.songCurrentDurationLabel);
         songTotalDurationLabel = (TextView) findViewById(R.id.songTotalDurationLabel);
 
+        artistName = (TextView) findViewById(R.id.artistName);
+        albumName = (TextView) findViewById(R.id.albumName);
+        albumArtwork = (ImageView) findViewById(R.id.albumArtwork);
+
         // Mediaplayer
         mp = new MediaPlayer();
+
         //songManager = new SongsManager();
         utils = new Utilities();
 
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paused = !paused;
+                if (paused) {
+                    mp.pause();
+                    btnPlay.setBackgroundResource(R.drawable.ic_media_play);
+                } else {
+                    mp.start();
+                    btnPlay.setBackgroundResource(R.drawable.ic_media_pause);
+                }
+            }
+        });
 
         // Listeners
         songProgressBar.setOnSeekBarChangeListener(this); // Important
         mp.setOnCompletionListener(this); // Important
-
-
-        // Getting all songs list
-        //songsList = songManager.getPlayList();
-
-        // By default play first song
-        //playSong(0);
-
-        /**
-         * Play button click event
-         * plays a song and changes button to pause image
-         * pauses a song and changes button to play image
-         * */
-//        btnPlay.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View arg0) {
-//                // check for already playing
-//                if(mp.isPlaying()){
-//                    if(mp!=null){
-//                        mp.pause();
-//                        // Changing button image to play button
-//                        btnPlay.setButtonDrawable(R.drawable.ic_media_play);
-//                    }
-//                }else{
-//                    // Resume song
-//                    if(mp!=null){
-//                        mp.start();
-//                        // Changing button image to pause button
-//                        btnPlay.setButtonDrawable(R.drawable.ic_media_pause);
-//                    }
-//                }
-//
-//            }
-//        });
-
 
         /**
          * Next button click event
@@ -104,16 +98,11 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
 
             @Override
             public void onClick(View arg0) {
-                // check if next song is there or not
-                if (currentSongIndex < (songsList.size() - 1)) {
-                    playSong(currentSongIndex + 1);
-                    currentSongIndex = currentSongIndex + 1;
-                } else {
-                    // play first song
-                    playSong(0);
-                    currentSongIndex = 0;
+                int nextIndex = 0;
+                if (mIndex != mParcelableTopTracks.size()) {
+                    nextIndex = ++mIndex;
                 }
-
+                playSong(nextIndex);
             }
         });
 
@@ -125,19 +114,24 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
 
             @Override
             public void onClick(View arg0) {
-                if (currentSongIndex > 0) {
-                    playSong(currentSongIndex - 1);
-                    currentSongIndex = currentSongIndex - 1;
-                } else {
-                    // play last song
-                    playSong(songsList.size() - 1);
-                    currentSongIndex = songsList.size() - 1;
+                int nextIndex = 0;
+                if (mIndex == 0) {
+                    nextIndex = mParcelableTopTracks.size();
                 }
-
+                playSong(nextIndex);
             }
         });
+
+        Intent intentTopTracksAdapter = getIntent();
+        mParcelableTopTracks = intentTopTracksAdapter.getParcelableArrayListExtra("TopTracks");
+        mIndex = intentTopTracksAdapter.getIntExtra("index", 0);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        playSong(mIndex);
+    }
 
     /**
      * Receiving song index from playlist view
@@ -163,17 +157,32 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
     public void playSong(int songIndex) {
         // Play song
         try {
+            if (mParcelableTopTracks == null) {
+                return;
+            } else if (mParcelableTopTracks.size() < songIndex) {
+                return;
+            }
+
+            mIndex = songIndex;
+            ParcelableTopTrack track = mParcelableTopTracks.get(songIndex);
+
             mp.reset();
-            mp.setDataSource(songsList.get(songIndex).get("songPath"));
+            mp.setDataSource(track.trackUrl);
             mp.prepare();
+            mp.seekTo(trackProgress);
             mp.start();
             // Displaying Song title
-            String songTitle = songsList.get(songIndex).get("songTitle");
 
-            songTitleLabel.setText(songTitle);
+            artistName.setText(track.artistName);
+            albumName.setText(track.albumName);
+            songTitleLabel.setText(track.trackName);
+
+            Picasso picasso = Picasso.with(this);
+            RequestCreator requestCreator = picasso.load(track.albumImage);
+            requestCreator.into(albumArtwork);
 
             // Changing Button Image to pause image
-            btnPlay.setButtonDrawable(R.drawable.ic_media_pause);
+            btnPlay.setBackgroundResource(R.drawable.ic_media_pause);
 
             // set Progress bar values
             songProgressBar.setProgress(0);
@@ -202,16 +211,21 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
      */
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
+
+            if (mp == null) {
+                return;
+            }
+
             long totalDuration = mp.getDuration();
-            long currentDuration = mp.getCurrentPosition();
+            trackProgress = mp.getCurrentPosition();
 
             // Displaying Total Duration time
             songTotalDurationLabel.setText("" + utils.milliSecondsToTimer(totalDuration));
             // Displaying time completed playing
-            songCurrentDurationLabel.setText("" + utils.milliSecondsToTimer(currentDuration));
+            songCurrentDurationLabel.setText("" + utils.milliSecondsToTimer(trackProgress));
 
             // Updating progress bar
-            int progress = utils.getProgressPercentage(currentDuration, totalDuration);
+            int progress = utils.getProgressPercentage(trackProgress, totalDuration);
             //Log.d("Progress", ""+progress);
             songProgressBar.setProgress(progress);
 
@@ -258,6 +272,7 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
     public void onDestroy() {
         super.onDestroy();
         mp.release();
+        mp = null;
     }
 
     @Override
