@@ -114,18 +114,21 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
 
             @Override
             public void onClick(View arg0) {
-                int nextIndex = 0;
-                if (mIndex == 0) {
-                    nextIndex = mParcelableTopTracks.size();
+                int previousIndex = 0;
+                if (mIndex != mParcelableTopTracks.size()) {
+                    previousIndex = --mIndex;
                 }
-                playSong(nextIndex);
+                playSong(previousIndex);
             }
         });
 
         Intent intentTopTracksAdapter = getIntent();
         mParcelableTopTracks = intentTopTracksAdapter.getParcelableArrayListExtra("TopTracks");
         mIndex = intentTopTracksAdapter.getIntExtra("index", 0);
+
+
     }
+
 
     @Override
     protected void onResume() {
@@ -197,6 +200,8 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
     /**
@@ -269,14 +274,35 @@ public class SpotifyPlayer extends Activity implements OnCompletionListener, See
 
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("position", trackProgress);
+        outState.putInt("current", mIndex);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            trackProgress = savedInstanceState.getInt("position");
+            mIndex = savedInstanceState.getInt("current");
+        }
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         mp.release();
         mp = null;
     }
 
+
     @Override
     public void onCompletion(MediaPlayer mp) {
 
     }
+
+
 }
