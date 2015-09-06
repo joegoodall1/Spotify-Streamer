@@ -4,23 +4,22 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
+
+    private boolean isTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        determinePaneLayout();
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new SpotifyFragment())
-                    .commit();
-        }
 
         ConnectivityManager cm = (ConnectivityManager) getApplicationContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -36,4 +35,20 @@ public class MainActivity extends ActionBarActivity {
         Toast.makeText(getApplicationContext(), answer, Toast.LENGTH_LONG).show();
     }
 
+    private void determinePaneLayout() {
+        FrameLayout fragmentDetails = (FrameLayout) findViewById(R.id.details_frag);
+        if (fragmentDetails != null) {
+            isTwoPane = true;
+
+        } else {
+            isTwoPane = false;
+        }
+
+
+    }
+
+
+
 }
+
+

@@ -25,7 +25,7 @@
         android:layout_below="@+id/artistName"
         android:layout_centerHorizontal="true"
         android:textColor="@android:color/darker_gray"
-        android:textSize="25dp"/>
+        android:textSize="20dp"/>
 
     <ImageView
         android:layout_width="match_parent"

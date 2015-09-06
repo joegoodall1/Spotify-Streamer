@@ -22,9 +22,11 @@ public class ArtistsAdapter extends ArrayAdapter<ParcelableArtist> {
     private static final String ARTIST_NAME_KEY = "artist_name";
     private static final String ARTIST_ID_KEY = "artist_id";
 
+
     public ArtistsAdapter(Context context, List<ParcelableArtist> parcelableArtists) {
         super(context, 0, parcelableArtists);
     }
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -43,7 +45,6 @@ public class ArtistsAdapter extends ArrayAdapter<ParcelableArtist> {
 
         // Populate the data into the template view using the data object
         mTextView.setText(parcelableArtist.name);
-
 
         if (parcelableArtist.imageURL == null) {
             mImageView.setImageResource(R.mipmap.spotify1);
