@@ -35,13 +35,14 @@ import retrofit.client.Response;
  */
 public class SpotifyFragment extends Fragment {
 
-
     private ArtistsAdapter mArtistsAdapter;
     private SpotifyService mSpotifyService;
 
-    public SpotifyFragment() {
-    }
+    private ArtistsAdapter.ArtistsAdapterListener mArtistListener;
 
+    public void setArtistListener(ArtistsAdapter.ArtistsAdapterListener artistListener) {
+        mArtistListener = artistListener;
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -112,7 +113,7 @@ public class SpotifyFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mArtistsAdapter = new ArtistsAdapter(getActivity(), new ArrayList<ParcelableArtist>());
+        mArtistsAdapter = new ArtistsAdapter(getActivity(), new ArrayList<ParcelableArtist>(), mArtistListener);
         if (savedInstanceState != null) {
             ArrayList<ParcelableArtist> artists = savedInstanceState.getParcelableArrayList("artists");
             if (artists != null)

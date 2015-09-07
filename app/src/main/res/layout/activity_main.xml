@@ -7,7 +7,7 @@
     <!-- "Fragment A" -->
     <fragment
         class="com.getstrength.spotifystreamer.SpotifyFragment"
-        android:id="@+id/list_frag"
+        android:id="@+id/artist_frag"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </FrameLayout>
