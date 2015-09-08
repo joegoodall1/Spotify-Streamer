@@ -35,18 +35,19 @@ import retrofit.client.Response;
  */
 public class SpotifyFragment extends Fragment {
 
-    //private static final String SAVE_QUERY_KEY = "query";
-
     private ArtistsAdapter mArtistsAdapter;
     private SpotifyService mSpotifyService;
 
-    public SpotifyFragment() {
-    }
+    private ArtistsAdapter.ArtistsAdapterListener mArtistListener;
 
+    public void setArtistListener(ArtistsAdapter.ArtistsAdapterListener artistListener) {
+        mArtistListener = artistListener;
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
         ArrayList<ParcelableArtist> list = new ArrayList<>();
         for (int i = 0; i < mArtistsAdapter.getCount(); i++) {
             list.add(mArtistsAdapter.getItem(i));
@@ -112,7 +113,7 @@ public class SpotifyFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mArtistsAdapter = new ArtistsAdapter(getActivity(), new ArrayList<ParcelableArtist>());
+        mArtistsAdapter = new ArtistsAdapter(getActivity(), new ArrayList<ParcelableArtist>(), mArtistListener);
         if (savedInstanceState != null) {
             ArrayList<ParcelableArtist> artists = savedInstanceState.getParcelableArrayList("artists");
             if (artists != null)
@@ -131,23 +132,7 @@ public class SpotifyFragment extends Fragment {
     }
 
     
-    /*@Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState != null) {
-            String query = savedInstanceState.getString(SpotifyFragment.SAVE_QUERY_KEY);
-            if (query != null) {
-                performQuery(query);
-            }
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(SpotifyFragment.SAVE_QUERY_KEY, mSearchQuery);
-    }*/
 
     private void onSpotifyResults(ArtistsPager artistsPager) {
 

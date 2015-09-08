@@ -1,6 +1,7 @@
 package com.getstrength.spotifystreamer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,25 +12,28 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
-import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Image;
-import kaaes.spotify.webapi.android.models.Track;
+import java.util.ArrayList;
 
 /**
  * Created by Joe on 09/07/15.
  */
-public class TopTracksAdapter extends ArrayAdapter<Track> {
+public class TopTracksAdapter extends ArrayAdapter<ParcelableTopTrack> {
 
-    public TopTracksAdapter(Context context, List<Track> artists) {
-        super(context, 0, artists);
+    private static final String TRACK_NAME = "track_name";
+    private static final String ALBUM_NAME = "album_name";
+
+    private ArrayList<ParcelableTopTrack> mParcelableTopTracks;
+
+    public TopTracksAdapter(Context context, ArrayList<ParcelableTopTrack> parcelableTopTracks) {
+        super(context, 0, parcelableTopTracks);
+        mParcelableTopTracks = parcelableTopTracks;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         // Get the data item for this position
-        final Track track = super.getItem(position);
+        final ParcelableTopTrack parcelableTopTrack = super.getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -41,20 +45,28 @@ public class TopTracksAdapter extends ArrayAdapter<Track> {
         TextView mTextView2 = (TextView) convertView.findViewById(R.id.album_name);
         ImageView mImageView = (ImageView) convertView.findViewById(R.id.artistView);
 
-
         // Populate the data into the template view using the data object
-        mTextView.setText(track.name);
-        mTextView2.setText(track.album.name);
+        mTextView.setText(parcelableTopTrack.trackName);
+        mTextView2.setText(parcelableTopTrack.albumName);
 
-        List<Image> images = track.album.images;
-
-        if (images.size() == 0) {
+        if (parcelableTopTrack.albumImage == null) {
             mImageView.setImageResource(R.mipmap.spotify1);
         } else {
             Picasso picasso = Picasso.with(super.getContext());
-            RequestCreator requestCreator = picasso.load(images.get(0).url);
+            RequestCreator requestCreator = picasso.load(parcelableTopTrack.albumImage);
             requestCreator.into(mImageView);
         }
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context context = TopTracksAdapter.this.getContext();
+                Intent intent = new Intent(context, SpotifyPlayer.class);
+                intent.putParcelableArrayListExtra("TopTracks", mParcelableTopTracks);
+                intent.putExtra("index", position);
+                context.startActivity(intent);
+            }
+        });
 
         // Return the completed view to render on screen
         return convertView;

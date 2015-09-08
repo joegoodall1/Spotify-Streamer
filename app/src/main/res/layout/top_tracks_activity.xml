@@ -1,12 +1,12 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/container"
-          tools:layout="@layout/fragment_main"
-          android:layout_width="match_parent"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/container"
+             tools:layout="@layout/fragment_main"
+             android:layout_width="match_parent"
              android:layout_height="match_parent">
     <!-- "Fragment A" -->
     <fragment
-        class="com.getstrength.spotifystreamer.SpotifyFragment"
+        class="com.getstrength.spotifystreamer.TopTracksFragment"
         android:id="@+id/artist_frag"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
