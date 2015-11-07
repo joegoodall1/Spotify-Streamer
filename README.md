@@ -1,34 +1,8 @@
 # Spotify Streamer
 
-TODO: Write a project description
-
-## Installation
-
-TODO: Describe the installation process
+Udacity project: Built a music streaming application to replicate one of the world's most popular app experiences. Added to the music streaming app by building a new track player UI, and optimized the end-to-end experience for tablet.
 
 ## Usage
 
-TODO: Write usage instructions
+Can be used to search for artists which are displayed in a list. After selecting an artist their top 10 tracks are displayed and after one of them is selected a 30 second clip of the track is played via the media player.
 
-## Contributing
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
-
-## History
-
-TODO: Write history
-
-## Credits
-
-TODO: Write credits
-
-## License
-
-TODO: Write license
-]]></content>
-  <tabTrigger>readme</tabTrigger>
-</snippet>
