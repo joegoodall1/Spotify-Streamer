@@ -1,5 +1,3 @@
-<snippet>
-  <content>
 # Spotify Streamer
 
 TODO: Write a project description
