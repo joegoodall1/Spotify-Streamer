@@ -1,6 +1,6 @@
 <snippet>
   <content><![CDATA[
-# ${1:Spotify Streamer}
+# Spotify Streamer
 
 TODO: Write a project description
 
