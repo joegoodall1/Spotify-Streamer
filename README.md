@@ -1,5 +1,5 @@
 <snippet>
-  <content><![CDATA[
+  <content>
 # Spotify Streamer
 
 TODO: Write a project description
