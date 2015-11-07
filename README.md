@@ -4,5 +4,5 @@ Udacity project: Built a music streaming application to replicate one of the wor
 
 ## Usage
 
-Can be used to search for artists which are displayed in a list. After selecting an artist their top 10 tracks are displayed and after selection a 30 second clip of the track is played via the media player.
+Can be used to search for artists which are displayed in a list. After selecting an artist their top 10 tracks are displayed and after selection a 30 second clip of the track is played via a media player.
 
